@@ -140,7 +140,7 @@ impl Texture {
             let config = config.unwrap();
 
             // Create the texture sampler.
-            let sampler = device.create_sampler(&config.sampler_desc);
+            let sampler = device.create_sampler(&config.sampler_desc).unwrap();
 
             // Create the texture bind group from the layout.
             Arc::new(device.create_bind_group(&BindGroupDescriptor {
@@ -156,7 +156,7 @@ impl Texture {
                         resource: BindingResource::Sampler(&sampler),
                     },
                 ],
-            }))
+            }).unwrap())
         });
 
         Self {
@@ -179,13 +179,13 @@ impl Texture {
             format: config.format.unwrap_or(renderer.config.texture_format),
             usage: config.usage,
             view_formats: &[config.format.unwrap_or(renderer.config.texture_format)],
-        }));
+        }).unwrap());
 
         // Extract the texture view.
-        let view = Arc::new(texture.create_view(&TextureViewDescriptor::default()));
+        let view = Arc::new(texture.create_view(&TextureViewDescriptor::default()).unwrap());
 
         // Create the texture sampler.
-        let sampler = device.create_sampler(&config.sampler_desc);
+        let sampler = device.create_sampler(&config.sampler_desc).unwrap();
 
         // Create the texture bind group from the layout.
         let bind_group = Arc::new(device.create_bind_group(&BindGroupDescriptor {
@@ -201,7 +201,7 @@ impl Texture {
                     resource: BindingResource::Sampler(&sampler),
                 },
             ],
-        }));
+        }).unwrap());
 
         Self {
             texture,
@@ -239,7 +239,7 @@ impl Texture {
                 height,
                 depth_or_array_layers: 1,
             },
-        );
+        ).unwrap();
     }
 
     /// The width of the texture in pixels.
@@ -369,7 +369,7 @@ impl Renderer {
         } = config;
 
         // Load shaders.
-        let shader_module = device.create_shader_module(shader.unwrap());
+        let shader_module = device.create_shader_module(shader.unwrap()).unwrap();
 
         // Create the uniform matrix buffer.
         let size = 64;
@@ -378,7 +378,7 @@ impl Renderer {
             size,
             usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
             mapped_at_creation: false,
-        });
+        }).unwrap();
 
         // Create the uniform matrix buffer bind group layout.
         let uniform_layout = device.create_bind_group_layout(&BindGroupLayoutDescriptor {
@@ -393,7 +393,7 @@ impl Renderer {
                 },
                 count: None,
             }],
-        });
+        }).unwrap();
 
         // Create the uniform matrix buffer bind group.
         let uniform_bind_group = device.create_bind_group(&BindGroupDescriptor {
@@ -403,7 +403,7 @@ impl Renderer {
                 binding: 0,
                 resource: uniform_buffer.as_entire_binding(),
             }],
-        });
+        }).unwrap();
 
         // Create the texture layout for further usage.
         let texture_layout = device.create_bind_group_layout(&BindGroupLayoutDescriptor {
@@ -426,14 +426,14 @@ impl Renderer {
                     count: None,
                 },
             ],
-        });
+        }).unwrap();
 
         // Create the render pipeline layout.
         let pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
             label: Some("imgui-wgpu pipeline layout"),
             bind_group_layouts: &[&uniform_layout, &texture_layout],
             push_constant_ranges: &[],
-        });
+        }).unwrap();
 
         // Create the render pipeline.
         // Create the render pipeline.
@@ -490,7 +490,7 @@ impl Renderer {
                 })],
             }),
             multiview: None,
-        });
+        }).unwrap();
 
         let mut renderer = Self {
             pipeline,
@@ -610,12 +610,12 @@ impl Renderer {
                 label: Some("imgui-wgpu index buffer"),
                 contents: &indices,
                 usage: BufferUsages::INDEX | BufferUsages::COPY_DST,
-            });
+            }).unwrap();
             render_data.index_buffer = Some(buffer);
             render_data.index_buffer_size = indices.len();
         } else if let Some(buffer) = render_data.index_buffer.as_ref() {
             // The buffer is large enough for the new indices, so reuse it
-            queue.write_buffer(buffer, 0, &indices);
+            queue.write_buffer(buffer, 0, &indices).unwrap();
         } else {
             unreachable!()
         }
@@ -626,12 +626,12 @@ impl Renderer {
                 label: Some("imgui-wgpu vertex buffer"),
                 contents: &vertices,
                 usage: BufferUsages::VERTEX | BufferUsages::COPY_DST,
-            });
+            }).unwrap();
             render_data.vertex_buffer = Some(buffer);
             render_data.vertex_buffer_size = vertices.len();
         } else if let Some(buffer) = render_data.vertex_buffer.as_ref() {
             // The buffer is large enough for the new vertices, so reuse it
-            queue.write_buffer(buffer, 0, &vertices);
+            queue.write_buffer(buffer, 0, &vertices).unwrap();
         } else {
             unreachable!()
         }
@@ -762,7 +762,7 @@ impl Renderer {
     /// Updates the current uniform buffer containing the transform matrix.
     fn update_uniform_buffer(&self, queue: &Queue, matrix: &[[f32; 4]; 4]) {
         let data = bytemuck::bytes_of(matrix);
-        queue.write_buffer(&self.uniform_buffer, 0, data);
+        queue.write_buffer(&self.uniform_buffer, 0, data).unwrap();
     }
 
     /// Updates the texture on the GPU corresponding to the current imgui font atlas.

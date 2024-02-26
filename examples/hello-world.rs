@@ -200,7 +200,7 @@ fn main() {
                 }
 
                 let mut encoder: wgpu::CommandEncoder =
-                    device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+                    device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None }).unwrap();
 
                 if last_cursor != Some(ui.mouse_cursor()) {
                     last_cursor = Some(ui.mouse_cursor());
@@ -209,7 +209,8 @@ fn main() {
 
                 let view = frame
                     .texture
-                    .create_view(&wgpu::TextureViewDescriptor::default());
+                    .create_view(&wgpu::TextureViewDescriptor::default())
+                    .unwrap();
                 let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                     label: None,
                     color_attachments: &[Some(wgpu::RenderPassColorAttachment {
@@ -231,7 +232,7 @@ fn main() {
 
                 drop(rpass);
 
-                queue.submit(Some(encoder.finish()));
+                queue.submit(Some(encoder.finish().unwrap()));
 
                 frame.present();
             }

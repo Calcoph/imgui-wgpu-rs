@@ -134,13 +134,13 @@ impl Example {
             label: Some("Vertex Buffer"),
             contents: bytemuck::cast_slice(&vertex_data),
             usage: wgpu::BufferUsages::VERTEX,
-        });
+        }).unwrap();
 
         let index_buf = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Index Buffer"),
             contents: bytemuck::cast_slice(&index_data),
             usage: wgpu::BufferUsages::INDEX,
-        });
+        }).unwrap();
 
         // Create pipeline layout
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
@@ -167,12 +167,12 @@ impl Example {
                     count: None,
                 },
             ],
-        });
+        }).unwrap();
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: None,
             bind_group_layouts: &[&bind_group_layout],
             push_constant_ranges: &[],
-        });
+        }).unwrap();
 
         // Create the texture
         let size = 256u32;
@@ -191,8 +191,8 @@ impl Example {
             format: wgpu::TextureFormat::R8Uint,
             usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
             view_formats: &[wgpu::TextureFormat::R8Uint],
-        });
-        let texture_view = texture.create_view(&wgpu::TextureViewDescriptor::default());
+        }).unwrap();
+        let texture_view = texture.create_view(&wgpu::TextureViewDescriptor::default()).unwrap();
         queue.write_texture(
             texture.as_image_copy(),
             &texels,
@@ -202,7 +202,7 @@ impl Example {
                 rows_per_image: None,
             },
             texture_extent,
-        );
+        ).unwrap();
 
         // Create other resources
         let mx_total = Self::generate_matrix(config.width as f32 / config.height as f32);
@@ -211,7 +211,7 @@ impl Example {
             label: Some("Uniform Buffer"),
             contents: bytemuck::cast_slice(mx_ref),
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-        });
+        }).unwrap();
 
         // Create bind group
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
@@ -227,9 +227,9 @@ impl Example {
                 },
             ],
             label: None,
-        });
+        }).unwrap();
 
-        let shader = device.create_shader_module(include_wgsl!("../resources/cube.wgsl"));
+        let shader = device.create_shader_module(include_wgsl!("../resources/cube.wgsl")).unwrap();
 
         let vertex_buffers = [wgpu::VertexBufferLayout {
             array_stride: vertex_size as wgpu::BufferAddress,
@@ -268,7 +268,7 @@ impl Example {
             depth_stencil: None,
             multisample: wgpu::MultisampleState::default(),
             multiview: None,
-        });
+        }).unwrap();
 
         // Done
         Example {
@@ -289,12 +289,12 @@ impl Example {
     fn setup_camera(&mut self, queue: &wgpu::Queue, size: [f32; 2]) {
         let mx_total = Self::generate_matrix(size[0] / size[1]);
         let mx_ref: &[f32; 16] = mx_total.as_ref();
-        queue.write_buffer(&self.uniform_buf, 0, bytemuck::cast_slice(mx_ref));
+        queue.write_buffer(&self.uniform_buf, 0, bytemuck::cast_slice(mx_ref)).unwrap();
     }
 
     fn render(&mut self, view: &wgpu::TextureView, device: &wgpu::Device, queue: &wgpu::Queue) {
         let mut encoder =
-            device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+            device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None }).unwrap();
         {
             let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: None,
@@ -325,7 +325,7 @@ impl Example {
             rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
         }
 
-        queue.submit(Some(encoder.finish()));
+        queue.submit(Some(encoder.finish().unwrap()));
     }
 }
 
@@ -509,7 +509,8 @@ fn main() {
 
                 let view = frame
                     .texture
-                    .create_view(&wgpu::TextureViewDescriptor::default());
+                    .create_view(&wgpu::TextureViewDescriptor::default())
+                    .unwrap();
 
                 // Render example normally at background
                 example.update(ui.io().delta_time);
@@ -557,7 +558,7 @@ fn main() {
                 }
 
                 let mut encoder: wgpu::CommandEncoder =
-                    device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+                    device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None }).unwrap();
 
                 if last_cursor != Some(ui.mouse_cursor()) {
                     last_cursor = Some(ui.mouse_cursor());
@@ -586,7 +587,7 @@ fn main() {
 
                 drop(rpass);
 
-                queue.submit(Some(encoder.finish()));
+                queue.submit(Some(encoder.finish().unwrap()));
                 frame.present();
             }
             _ => (),
