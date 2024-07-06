@@ -3,7 +3,7 @@ use imgui::*;
 use imgui_wgpu::{Renderer, RendererConfig, Texture, TextureConfig};
 use pollster::block_on;
 use std::time::Instant;
-use wgpu::{include_wgsl, util::DeviceExt, Extent3d};
+use wgpu::{include_wgsl, util::DeviceExt, Extent3d, PipelineCompilationOptions};
 use winit::{
     dpi::LogicalSize,
     event::{ElementState, Event, WindowEvent, KeyEvent},
@@ -255,11 +255,13 @@ impl Example {
                 module: &shader,
                 entry_point: "vs_main",
                 buffers: &vertex_buffers,
+                compilation_options: PipelineCompilationOptions::default(),
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
                 entry_point: "fs_main",
                 targets: &[Some(config.format.into())],
+                compilation_options: PipelineCompilationOptions::default(),
             }),
             primitive: wgpu::PrimitiveState {
                 cull_mode: Some(wgpu::Face::Back),
