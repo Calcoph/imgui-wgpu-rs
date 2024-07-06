@@ -46,7 +46,7 @@ bytemuck = "1"
 imgui = "0.12"
 log = "0.4"
 smallvec = "1"
-wgpu = { git = "https://github.com/Calcoph/te-wgpu", rev = "6bb30b0" }
+wgpu = { git = "https://github.com/Calcoph/te-wgpu", rev = "fa7d7e988ef2b198697fa6870d85eae0e6e55185" } # v0.20.1
 
 [dev-dependencies]
 bytemuck = { version = "1.13", features = ["derive"] }
