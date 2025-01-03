@@ -9,7 +9,7 @@ use winit::{
     event::{ElementState, Event, KeyEvent, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     keyboard::{Key, NamedKey},
-    window::{Window, WindowAttributes},
+    window::WindowAttributes,
 };
 
 fn main() {

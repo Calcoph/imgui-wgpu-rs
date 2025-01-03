@@ -9,7 +9,7 @@ use winit::{
     event::{ElementState, Event, KeyEvent, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     keyboard::{Key, NamedKey},
-    window::{Window, WindowAttributes},
+    window::WindowAttributes,
 };
 
 const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::new(
@@ -253,13 +253,13 @@ impl Example {
             layout: Some(&pipeline_layout),
             vertex: wgpu::VertexState {
                 module: &shader,
-                entry_point: "vs_main",
+                entry_point: Some("vs_main"),
                 buffers: &vertex_buffers,
                 compilation_options: PipelineCompilationOptions::default(),
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
-                entry_point: "fs_main",
+                entry_point: Some("fs_main"),
                 targets: &[Some(config.format.into())],
                 compilation_options: PipelineCompilationOptions::default(),
             }),
@@ -318,14 +318,14 @@ impl Example {
                 occlusion_query_set: None,
                 timestamp_writes: None,
             }).unwrap();
-            rpass.push_debug_group("Prepare data for draw.");
-            rpass.set_pipeline(&self.pipeline);
-            rpass.set_bind_group(0, &self.bind_group, &[]);
-            rpass.set_index_buffer(self.index_buf.slice(..), wgpu::IndexFormat::Uint16);
-            rpass.set_vertex_buffer(0, self.vertex_buf.slice(..));
-            rpass.pop_debug_group();
-            rpass.insert_debug_marker("Draw!");
-            rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
+            rpass.push_debug_group("Prepare data for draw.").unwrap();
+            rpass.set_pipeline(&self.pipeline).unwrap();
+            rpass.set_bind_group(0, &self.bind_group, &[]).unwrap();
+            rpass.set_index_buffer(self.index_buf.slice(..), wgpu::IndexFormat::Uint16).unwrap();
+            rpass.set_vertex_buffer(0, self.vertex_buf.slice(..)).unwrap();
+            rpass.pop_debug_group().unwrap();
+            rpass.insert_debug_marker("Draw!").unwrap();
+            rpass.draw_indexed(0..self.index_count as u32, 0, 0..1).unwrap();
         }
 
         queue.submit(Some(encoder.finish().unwrap()));
