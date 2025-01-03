@@ -6,10 +6,10 @@ use std::time::Instant;
 use wgpu::{include_wgsl, util::DeviceExt, Extent3d, PipelineCompilationOptions};
 use winit::{
     dpi::LogicalSize,
-    event::{ElementState, Event, WindowEvent, KeyEvent},
+    event::{ElementState, Event, KeyEvent, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     keyboard::{Key, NamedKey},
-    window::Window,
+    window::{Window, WindowAttributes},
 };
 
 const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::new(
@@ -270,6 +270,7 @@ impl Example {
             depth_stencil: None,
             multisample: wgpu::MultisampleState::default(),
             multiview: None,
+            cache: None,
         }).unwrap();
 
         // Done
@@ -316,7 +317,7 @@ impl Example {
                 depth_stencil_attachment: None,
                 occlusion_query_set: None,
                 timestamp_writes: None,
-            });
+            }).unwrap();
             rpass.push_debug_group("Prepare data for draw.");
             rpass.set_pipeline(&self.pipeline);
             rpass.set_bind_group(0, &self.bind_group, &[]);
@@ -345,7 +346,7 @@ fn main() {
     let (window, size) = {
         let version = env!("CARGO_PKG_VERSION");
 
-        let window = Window::new(&event_loop).unwrap();
+        let window = event_loop.create_window(WindowAttributes::default()).unwrap();
         let _ = window.request_inner_size(LogicalSize::new(1280.0, 720.0));
         window.set_title(&format!("imgui-wgpu {version}"));
         let size = window.inner_size();
@@ -581,7 +582,7 @@ fn main() {
                     depth_stencil_attachment: None,
                     occlusion_query_set: None,
                     timestamp_writes: None,
-                });
+                }).unwrap();
 
                 renderer
                     .render(imgui.render(), &queue, &device, &mut rpass)

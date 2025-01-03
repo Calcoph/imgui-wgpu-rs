@@ -46,17 +46,17 @@ bytemuck = "1"
 imgui = "0.12"
 log = "0.4"
 smallvec = "1"
-wgpu = { git = "https://github.com/Calcoph/te-wgpu", rev = "ca6df5041e5878b61c85676ae2f238943d6cef85" } # v0.20.2
+wgpu = { git = "https://github.com/Calcoph/te-wgpu", rev = "c202ee43164d2c6817e7a80963c28736fcd341eb" } # v22.1.0
 
 [dev-dependencies]
 bytemuck = { version = "1.13", features = ["derive"] }
 cgmath = "0.18"
 env_logger = "0.10"
 image = { version = "0.24", default-features = false, features = ["png"] }
-imgui-winit-support = "0.12"
+imgui-winit-support = "0.13"
 pollster = "0.3"
 raw-window-handle = "0.5"
-winit = "0.29"
+winit = "0.30"
 
 [package.metadata.docs.rs]
 all-features = true

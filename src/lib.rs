@@ -436,7 +436,6 @@ impl Renderer {
         }).unwrap();
 
         // Create the render pipeline.
-        // Create the render pipeline.
         let pipeline = device.create_render_pipeline(&RenderPipelineDescriptor {
             label: Some("imgui-wgpu pipeline"),
             layout: Some(&pipeline_layout),
@@ -492,6 +491,7 @@ impl Renderer {
                 compilation_options: PipelineCompilationOptions::default(),
             }),
             multiview: None,
+            cache: None,
         }).unwrap();
 
         let mut renderer = Self {
