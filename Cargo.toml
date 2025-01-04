@@ -46,7 +46,7 @@ bytemuck = "1"
 imgui = "0.12"
 log = "0.4"
 smallvec = "1"
-wgpu = { git = "https://github.com/Calcoph/te-wgpu", rev = "dc1b0b4238c43a3f27f60cd27fb6ed7f12b931ce" } # v23.1.0
+wgpu = { git = "https://github.com/Calcoph/te-wgpu", rev = "05e95d973bbe7ff0916bd80d657de941f85b3df7", features = ["skip_check_buffer_bounds"] } # v23.1.0 from imgui_patch branch
 
 [dev-dependencies]
 bytemuck = { version = "1.13", features = ["derive"] }
