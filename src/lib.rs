@@ -442,12 +442,12 @@ impl Renderer {
             vertex: VertexState {
                 module: &shader_module,
                 entry_point: vertex_shader_entry_point,
+                compilation_options: Default::default(),
                 buffers: &[VertexBufferLayout {
                     array_stride: size_of::<DrawVert>() as BufferAddress,
                     step_mode: VertexStepMode::Vertex,
                     attributes: &vertex_attr_array![0 => Float32x2, 1 => Float32x2, 2 => Unorm8x4],
                 }],
-                compilation_options: PipelineCompilationOptions::default(),
             },
             primitive: PrimitiveState {
                 topology: PrimitiveTopology::TriangleList,
@@ -472,6 +472,7 @@ impl Renderer {
             fragment: Some(FragmentState {
                 module: &shader_module,
                 entry_point: fragment_shader_entry_point,
+                compilation_options: Default::default(),
                 targets: &[Some(ColorTargetState {
                     format: texture_format,
                     blend: Some(BlendState {
@@ -488,7 +489,6 @@ impl Renderer {
                     }),
                     write_mask: ColorWrites::ALL,
                 })],
-                compilation_options: PipelineCompilationOptions::default(),
             }),
             multiview: None,
             cache: None,
@@ -654,13 +654,13 @@ impl Renderer {
             return Ok(());
         }
 
-        rpass.set_pipeline(&self.pipeline);
-        rpass.set_bind_group(0, &self.uniform_bind_group, &[]);
-        rpass.set_vertex_buffer(0, render_data.vertex_buffer.as_ref().unwrap().slice(..));
+        rpass.set_pipeline(&self.pipeline).unwrap();
+        rpass.set_bind_group(0, &self.uniform_bind_group, &[]).unwrap();
+        rpass.set_vertex_buffer(0, render_data.vertex_buffer.as_ref().unwrap().slice(..)).unwrap();
         rpass.set_index_buffer(
             render_data.index_buffer.as_ref().unwrap().slice(..),
             IndexFormat::Uint16,
-        );
+        ).unwrap();
 
         // Execute all the imgui render work.
         for (draw_list, bases) in draw_data
@@ -720,7 +720,7 @@ impl Renderer {
                     .textures
                     .get(texture_id)
                     .ok_or(RendererError::BadTexture(texture_id))?;
-                rpass.set_bind_group(1, Some(tex.bind_group.as_ref()), &[]);
+                rpass.set_bind_group(1, Some(tex.bind_group.as_ref()), &[]).unwrap();
 
                 // Set scissors on the renderpass.
                 let end = start + count as u32;
@@ -746,10 +746,10 @@ impl Renderer {
                     // is essentially a no-op render anyway, so just skip it.
                     // [1]: https://github.com/gfx-rs/wgpu/issues/1750
                     if scissors.2 > 0 && scissors.3 > 0 {
-                        rpass.set_scissor_rect(scissors.0, scissors.1, scissors.2, scissors.3);
+                        rpass.set_scissor_rect(scissors.0, scissors.1, scissors.2, scissors.3).unwrap();
 
                         // Draw the current batch of vertices with the renderpass.
-                        rpass.draw_indexed(start..end, vertex_base, 0..1);
+                        rpass.draw_indexed(start..end, vertex_base, 0..1).unwrap();
                     }
                 }
 
